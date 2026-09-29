@@ -43,7 +43,7 @@ services:
       - key: HR_USER_EMAIL
         value: hr@acme.example
       - key: HR_USER_PASSWORD
-        generateValue: true
+        value: password123
       - key: FRONTEND_ORIGIN
         value: https://salary-management-frontend-8njl.onrender.com
 
