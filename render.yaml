@@ -7,15 +7,16 @@
 #   - the Rails API, built from backend/Dockerfile
 #   - the React build, served as a static site
 #
-# NOTE on the two URLs below: Render assigns each web service a URL of the
-# form https://<name>.onrender.com, where <name> is the "name:" field below.
-# That's predictable *only* if the name isn't already taken on Render. If
-# Render appends a suffix (e.g. -a1b2) because of a collision, open each
-# service's Environment tab in the dashboard afterwards and update
-# FRONTEND_ORIGIN (on the backend) and VITE_API_URL (on the frontend) to
-# match the real assigned URLs, then trigger a redeploy of the frontend
-# (VITE_API_URL is baked in at build time, so it needs a rebuild to pick up
-# a change).
+# NOTE on the two URLs below: Render's actual assigned names got a
+# collision suffix on first deploy, so these are hardcoded to the real
+# assigned URLs (salary-management-backend-i7y8, -frontend-8njl) rather
+# than the guessed https://<name>.onrender.com pattern. If this blueprint
+# is ever deployed fresh under different names, update both values to
+# match whatever Render actually assigns, then redeploy the frontend
+# (VITE_API_URL is baked in at build time, so it needs a rebuild to pick
+# up a change) - editing them here, rather than only in the dashboard, is
+# what matters since a future Blueprint sync overwrites dashboard-only
+# edits with whatever is in this file.
 
 databases:
   - name: salary-management-db
@@ -44,7 +45,7 @@ services:
       - key: HR_USER_PASSWORD
         generateValue: true
       - key: FRONTEND_ORIGIN
-        value: https://salary-management-frontend.onrender.com
+        value: https://salary-management-frontend-8njl.onrender.com
 
   - type: web
     name: salary-management-frontend
@@ -53,4 +54,4 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://salary-management-backend.onrender.com/api
+        value: https://salary-management-backend-i7y8.onrender.com/api
