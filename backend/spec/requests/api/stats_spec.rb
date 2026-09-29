@@ -9,6 +9,7 @@ RSpec.describe "Api::Stats", type: :request do
       create(:employee, email: "a@acme.example", country: "India", department: "Engineering", salary_cents: 100_00)
       create(:employee, email: "b@acme.example", country: "India", department: "Engineering", salary_cents: 300_00)
       create(:employee, email: "c@acme.example", country: "United States", department: "Sales", salary_cents: 200_00)
+      create(:employee, email: "d@acme.example", country: "United States", department: "Engineering", salary_cents: 400_00)
     end
 
     it "requires authentication" do
@@ -16,29 +17,41 @@ RSpec.describe "Api::Stats", type: :request do
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it "returns overall headcount and payroll" do
+    it "returns overall headcount" do
       get "/api/stats", headers: headers
 
-      expect(json["total_headcount"]).to eq(3)
-      expect(json["total_payroll"]).to eq(600.0)
+      expect(json["total_headcount"]).to eq(4)
     end
 
-    it "breaks down averages by country" do
+    it "breaks down pay by country, in that country's own currency" do
       get "/api/stats", headers: headers
 
       india = json["by_country"].find { |row| row["country"] == "India" }
+      expect(india["currency"]).to eq("INR")
       expect(india["headcount"]).to eq(2)
+      expect(india["total_payroll"]).to eq(400.0)
       expect(india["average_salary"]).to eq(200.0)
       expect(india["min_salary"]).to eq(100.0)
       expect(india["max_salary"]).to eq(300.0)
     end
 
-    it "breaks down averages by department" do
+    it "breaks down pay by department within each country, never mixing currencies" do
       get "/api/stats", headers: headers
 
-      sales = json["by_department"].find { |row| row["department"] == "Sales" }
-      expect(sales["headcount"]).to eq(1)
-      expect(sales["average_salary"]).to eq(200.0)
+      us_engineering = json["by_department"].find do |row|
+        row["department"] == "Engineering" && row["country"] == "United States"
+      end
+      india_engineering = json["by_department"].find do |row|
+        row["department"] == "Engineering" && row["country"] == "India"
+      end
+
+      expect(us_engineering["currency"]).to eq("USD")
+      expect(us_engineering["headcount"]).to eq(1)
+      expect(us_engineering["average_salary"]).to eq(400.0)
+
+      expect(india_engineering["currency"]).to eq("INR")
+      expect(india_engineering["headcount"]).to eq(2)
+      expect(india_engineering["average_salary"]).to eq(200.0)
     end
   end
 
