@@ -1,0 +1,56 @@
+# Render Blueprint for this project. Deploy via https://dashboard.render.com/blueprints
+# -> "New Blueprint Instance" -> connect this GitHub repo -> Render reads this file.
+#
+# Creates three resources on Render's free tier:
+#   - a Postgres database (free Postgres instances expire after 90 days -
+#     fine for a take-home review, not for anything long-lived)
+#   - the Rails API, built from backend/Dockerfile
+#   - the React build, served as a static site
+#
+# NOTE on the two URLs below: Render assigns each web service a URL of the
+# form https://<name>.onrender.com, where <name> is the "name:" field below.
+# That's predictable *only* if the name isn't already taken on Render. If
+# Render appends a suffix (e.g. -a1b2) because of a collision, open each
+# service's Environment tab in the dashboard afterwards and update
+# FRONTEND_ORIGIN (on the backend) and VITE_API_URL (on the frontend) to
+# match the real assigned URLs, then trigger a redeploy of the frontend
+# (VITE_API_URL is baked in at build time, so it needs a rebuild to pick up
+# a change).
+
+databases:
+  - name: salary-management-db
+    databaseName: acme_salary
+    plan: free
+
+services:
+  - type: web
+    name: salary-management-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: salary-management-db
+          property: connectionString
+      - key: HR_USER_EMAIL
+        value: hr@acme.example
+      - key: HR_USER_PASSWORD
+        generateValue: true
+      - key: FRONTEND_ORIGIN
+        value: https://salary-management-frontend.onrender.com
+
+  - type: web
+    name: salary-management-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://salary-management-backend.onrender.com/api

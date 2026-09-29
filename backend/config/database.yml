@@ -83,3 +83,8 @@ test:
 production:
   <<: *default
   database: backend_production
+  # Render (and most PaaS hosts) provide a single DATABASE_URL rather than
+  # separate host/username/password. A blank url is ignored by Rails, so
+  # this falls back to the *default block's host/username/password (used by
+  # docker-compose) when DATABASE_URL isn't set.
+  url: <%= ENV["DATABASE_URL"] %>

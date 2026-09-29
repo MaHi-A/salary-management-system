@@ -50,6 +50,30 @@ cd backend && bundle exec rspec      # 45 examples: models, auth, CRUD, stats
 cd frontend && npm test              # component tests (login, list, stats)
 ```
 
+## Deploying to Render (free tier)
+
+`render.yaml` at the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec)
+that provisions the Rails API, the React static site, and a free Postgres
+database together:
+
+1. Push this repo to GitHub (already done if you're reading this on GitHub).
+2. On [Render](https://dashboard.render.com), go to **Blueprints -> New
+   Blueprint Instance** and connect this repo. Render reads `render.yaml`
+   and creates all three resources.
+3. Once the backend service is live, open its **Shell** tab (or use
+   `render.yaml`'s comment about the predictable service URL) and run
+   `bin/rails db:seed` once to generate the 10,000 employees and the HR
+   login - it isn't automatic on every deploy.
+4. If Render had to rename either service to avoid a name collision (check
+   the dashboard for the actual `.onrender.com` URLs), update
+   `FRONTEND_ORIGIN` on the backend and `VITE_API_URL` on the frontend to
+   match, then redeploy the frontend so the new `VITE_API_URL` gets baked
+   into the build.
+
+Render's free Postgres instances expire after 90 days - fine for a
+take-home review, not for anything long-lived. Free web services also spin
+down when idle and take a few seconds to wake back up on the next request.
+
 ## Deploying for real
 
 The Docker Compose setup is meant to demonstrate the whole stack running
