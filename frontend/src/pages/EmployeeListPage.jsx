@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../api/client'
+import { useMeta } from '../api/useMeta'
 
 const currencyFormatters = {}
 
@@ -18,8 +19,7 @@ function formatSalary(amount, currency) {
 export default function EmployeeListPage() {
   const [employees, setEmployees] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, total_pages: 1, total_count: 0 })
-  const [countries, setCountries] = useState([])
-  const [departments, setDepartments] = useState([])
+  const { countries, departments } = useMeta()
 
   const [q, setQ] = useState('')
   const [country, setCountry] = useState('')
@@ -30,13 +30,6 @@ export default function EmployeeListPage() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  useEffect(() => {
-    apiClient.get('/meta').then((response) => {
-      setCountries(response.data.countries)
-      setDepartments(response.data.departments)
-    })
-  }, [])
 
   useEffect(() => {
     setLoading(true)
