@@ -42,7 +42,11 @@ Rails.application.configure do
   # config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # Off by default here: this API is deployed behind plain HTTP in the local
+  # Docker Compose demo (no TLS termination in front of it). A real
+  # deployment behind a TLS-terminating proxy/load balancer should turn this
+  # back on.
+  config.force_ssl = false
 
   # Log to STDOUT by default
   config.logger = ActiveSupport::Logger.new(STDOUT)
