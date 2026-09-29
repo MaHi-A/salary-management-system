@@ -5,9 +5,14 @@
 hr_email = ENV.fetch("HR_USER_EMAIL", "hr@acme.example")
 hr_password = ENV.fetch("HR_USER_PASSWORD", "password123")
 
-User.find_or_create_by!(email: hr_email) do |user|
-  user.password = hr_password
-end
+# find_or_initialize_by + always setting the password (rather than
+# find_or_create_by! with the password only set on creation) means a
+# password rotation via HR_USER_PASSWORD takes effect just by re-running
+# this - no shell access to the deployed environment needed, which
+# matters on hosts (e.g. Render's free tier) that don't offer one.
+user = User.find_or_initialize_by(email: hr_email)
+user.password = hr_password
+user.save!
 
 puts "HR login ready: #{hr_email} / #{hr_password}"
 
