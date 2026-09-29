@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { apiClient, setAuthToken } from '../api/client'
+import { createContext, useContext, useState } from 'react'
+import { apiClient } from '../api/client'
 
 const AuthContext = createContext(null)
 const STORAGE_KEY = 'acme_salary_token'
@@ -7,10 +7,6 @@ const STORAGE_KEY = 'acme_salary_token'
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEY))
   const [email, setEmail] = useState(null)
-
-  useEffect(() => {
-    setAuthToken(token)
-  }, [token])
 
   async function login(loginEmail, password) {
     const response = await apiClient.post('/login', { email: loginEmail, password })
