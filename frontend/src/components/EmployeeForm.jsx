@@ -143,6 +143,7 @@ export default function EmployeeForm({
             id="hired_on"
             type="date"
             required
+            max={new Date().toISOString().slice(0, 10)}
             value={values.hired_on}
             onChange={update('hired_on')}
             className={FIELD_CLASS}

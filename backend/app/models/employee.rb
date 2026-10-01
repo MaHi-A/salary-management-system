@@ -33,7 +33,8 @@ class Employee < ApplicationRecord
   validates :currency, presence: true
   validates :salary_cents, presence: true,
                             numericality: { greater_than: 0, only_integer: true }
-  validates :hired_on, presence: true
+  validates :hired_on, presence: true,
+                        comparison: { less_than_or_equal_to: -> { Date.current }, message: "cannot be in the future" }
 
   validate :currency_matches_country
 

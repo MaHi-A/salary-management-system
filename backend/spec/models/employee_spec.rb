@@ -12,6 +12,17 @@ RSpec.describe Employee, type: :model do
   it { is_expected.to validate_presence_of(:job_title) }
   it { is_expected.to validate_presence_of(:hired_on) }
 
+  it "rejects a hire date in the future" do
+    employee.hired_on = Date.tomorrow
+    expect(employee).not_to be_valid
+    expect(employee.errors[:hired_on]).to include("cannot be in the future")
+  end
+
+  it "accepts a hire date of today" do
+    employee.hired_on = Date.current
+    expect(employee).to be_valid
+  end
+
   it "requires a unique email, case-insensitively" do
     create(:employee, email: "dup@acme.example")
     duplicate = build(:employee, email: "DUP@acme.example")
