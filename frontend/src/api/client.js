@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-const STORAGE_KEY = 'acme_salary_token'
+export const STORAGE_KEY = 'acme_salary_token'
 
 export const apiClient = axios.create({ baseURL: BASE_URL })
 

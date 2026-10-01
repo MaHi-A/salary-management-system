@@ -1,8 +1,7 @@
 import { createContext, useContext, useState } from 'react'
-import { apiClient } from '../api/client'
+import { apiClient, STORAGE_KEY } from '../api/client'
 
 const AuthContext = createContext(null)
-const STORAGE_KEY = 'acme_salary_token'
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEY))
